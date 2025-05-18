@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	o "payday/dto/order"
 	"payday/initializers"
 	"payday/models"
 	"payday/services"
@@ -30,7 +31,7 @@ func CreatePayment(c *gin.Context) {
 		return
 	}
 
-	var order models.Order
+	var order o.Order
 	order.Transaction.Amount = req.Amount
 	order.Transaction.Currency = "VND"
 	order.Transaction.BankCode = ""
@@ -129,7 +130,7 @@ func CreatePaymentBank(c *gin.Context) {
 		return
 	}
 
-	var order models.Order2
+	var order o.Order2
 	order.Transaction.Amount = req.Amount
 	order.Transaction.Currency = "VND"
 	order.Transaction.BankCode = "VPBANK"
@@ -325,42 +326,41 @@ func CheckOrder(c *gin.Context) {
 
 }
 
-type Transaction struct {
-	TransactionID    string `json:"transactionId"`
-	ReconciliationID string `json:"reconciliationId"`
-	PartnerCode      string `json:"partnerCode"`
-	Status           string `json:"status"`
-	ErrorCode        int    `json:"errorCode"`
-	ErrorMessage     string `json:"errorMessage"`
-	OrderAmount      int    `json:"orderAmount"`
-	Amount           int    `json:"amount"`
-	DiscountAmount   int    `json:"discountAmount"`
-	Currency         string `json:"currency"`
-	BankCode         string `json:"bankCode"`
-	PaymentMethod    string `json:"paymentMethod"`
-	Action           string `json:"action"`
-	ClientIP         string `json:"clientIp"`
-	Version          string `json:"version"`
-	Fee              Fee    `json:"fee"`
-	CreatedAt        string `json:"createdAt"`
-	UpdatedAt        string `json:"updatedAt"`
-}
-
-type Fee struct {
-	CustomerFee int `json:"customer_fee"`
-}
-
-type OrderInfo struct {
-	ID        string `json:"id"`
-	Info      string `json:"info"`
-	ExtraData string `json:"extraData"`
-}
-
-type PartnerReference struct {
-	Order OrderInfo `json:"order"`
-}
-
 type ResponseData struct {
-	Transaction      Transaction      `json:"transaction"`
-	PartnerReference PartnerReference `json:"partnerReference"`
+	Transaction struct {
+		TransactionID    string `json:"transactionId"`
+		ReconciliationID string `json:"reconciliationId"`
+		Status           string `json:"status"`
+		ErrorCode        int    `json:"errorCode"`
+		ErrorMessage     string `json:"errorMessage"`
+		PartnerCode      string `json:"partnerCode"`
+		Amount           int    `json:"amount"`
+		OrderAmount      int    `json:"orderAmount"`
+		DiscountAmount   int    `json:"discountAmount"`
+		Currency         string `json:"currency"`
+		BankCode         string `json:"bankCode"`
+		PaymentMethod    string `json:"paymentMethod"`
+		Action           string `json:"action"`
+		ClientIP         string `json:"clientIp"`
+		Version          string `json:"version"`
+		Fee              struct {
+			CustomerFee int `json:"customer_fee"`
+		} `json:"fee"`
+		CreatedAt string `json:"createdAt"`
+		UpdatedAt string `json:"updatedAt"`
+	} `json:"transaction"`
+
+	PartnerReference struct {
+		Order struct {
+			ID        string `json:"id"`
+			Info      string `json:"info"`
+			ExtraData string `json:"extraData"`
+		} `json:"order"`
+	} `json:"partnerReference"`
+
+	Authentication struct {
+		VerificationUrl    string `json:"verificationUrl"`
+		VerificationMethod string `json:"verificationMethod"`
+		VerificationStatus string `json:"verificationStatus"`
+	} `json:"authentication"`
 }
